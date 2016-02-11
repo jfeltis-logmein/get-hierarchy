@@ -9,19 +9,31 @@ var express = require('express'),
 
 app.set('port', (process.env.PORT || 1337));
 
-app.get('/requestAuthCode', function(req, res){
+app.get('/getHierarchy', function(req, res){
   soap.createClient(endpoint, function(e, client){
     if(e){
       console.error(e);
       return false;
     }
+
     client.requestAuthCode(args, function(er, results){
       if(er){
         console.error(er);
         return false;
       }
-      res.setHeader('content-type', 'application/json');
-      res.end(JSON.stringify(results));
+
+      var authCodeArgs = {
+        sAuthCode: results.sAuthCode
+      };
+
+      client.getHierarchy(authCodeArgs, function(err, getHierarchyResults){
+        if(err){
+          console.error(err);
+          return false;
+        }
+
+        res.end(JSON.stringify(getHierarchyResults));
+      });
     });
   });
 });
